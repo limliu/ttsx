@@ -1,12 +1,6 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>天天生鲜-登录</title>
-	<link rel="stylesheet" type="text/css" href="/static/css/reset.css">
-	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
-    <script type="text/javascript" src="/static/js/jquery-1.12.4.min.js"></script>
+{% extends "base.html" %}
 
+    {% block head %}
 
     <script>
 
@@ -15,20 +9,21 @@
             var name_err = false;
             var pwd_err = false;
 
-           $("#name").blur(function(){
+           $(".name_input").blur(function(){
                 fnname_check();
                }
            );
 
 
-             $("#pwd").blur(function () {
+             $(".pass_input").blur(function () {
 
                 fnpwd_check();
+
            });
 
 
             function fnname_check(){
-               name_len = $("#name").val().length;
+               var name_len = $(".name_input").val().length;
                if(name_len<5 || name_len>20){
                    $(".user_error").html('请输入5-20个字符的用户名').show();
                    name_err = true;
@@ -43,10 +38,12 @@
 
 
             function fnpwd_check(){
-                pwd_len = $("#pwd").val().length;
+                var pwd_len = $(".pass_input").val().length;
                 if(pwd_len<8 || pwd_len>20){
+
                    $(".pwd_error").html('密码最少8位，最长20位').show();
-                   pwd_err = true
+
+                   pwd_err = true;
 
                 }else{
                    $(".pwd_error").html('').hide();
@@ -69,15 +66,29 @@
             })
 
 
+           $(".name_input").focus(function(){
+                $(".user_error").html('');
+               }
+           );
+
+
+             $(".pass_input").focus(function () {
+                $(".pwd_error").html('');
+           });
+
+
+
         });
 
 
 
     </script>
 
+    {% endblock head %}
 
-</head>
-<body>
+
+{% block body %}
+
 	<div class="login_top clearfix">
 		<a href="../index.html" class="login_logo"><img src="/static/images/logo02.png"></a>
 	</div>
@@ -93,11 +104,15 @@
 				</div>
 				<div class="form_input">
 					<form method="post" action="/user/login_handle/">
+                        <div>hakjfshdkakdhkl</div>
                         {% csrf_token %}
-						<input type="text" name="name" class="name_input" placeholder="请输入用户名" value="{{ name}}" id="name">
-						<div class="user_error">{{ user_error|default:"" }}</div>
-						<input type="password" name="pwd" class="pass_input" placeholder="请输入密码" value="{{ pwd }}" id="pwd">
-						<div class="pwd_error">{{ pwd_error|default:"" }}</div>
+                       <input type="text" name="name" class="name_input" placeholder="请输入用户名" value="{{ name }}"  >
+
+                        <div class="user_error">{{ user_error|default:"" }}</div>
+					    <input type="password" name="pwd" class="pass_input" placeholder="请输入密码" value="{{ pwd }}" >
+
+
+                        <div class="pwd_error">{{ pwd_error|default:"" }}</div>
 						<div class="more_input clearfix">
 							<input type="checkbox" name="remember" checked="checked" value="1">
 							<label>记住用户名</label>
@@ -110,19 +125,6 @@
 		</div>
 	</div>
 
-	<div class="footer no-mp">
-		<div class="foot_link">
-			<a href="#">关于我们</a>
-			<span>|</span>
-			<a href="#">联系我们</a>
-			<span>|</span>
-			<a href="#">招聘人才</a>
-			<span>|</span>
-			<a href="#">友情链接</a>		
-		</div>
-		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
-		<p>电话：010-****888    京ICP备*******8号</p>
-	</div>
-	
-</body>
-</html>
+{% endblock body %}
+
+
