@@ -11,7 +11,7 @@ class UserInfo(models.Model):
     umail = models.CharField(max_length=30, blank=False)
 
     def __str__(self):
-        return self.uname
+        return self.uname.encode("utf-8")
 
 
 class ReceInfo(models.Model):
@@ -23,4 +23,4 @@ class ReceInfo(models.Model):
     ruser = models.ForeignKey("userinfo")
 
     def __str__(self):
-        return self.rshou
+        return self.rshou.encode("utf-8")

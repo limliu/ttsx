@@ -13,6 +13,8 @@ from hashlib import sha1
 
 import datetime
 
+from decorators import is_login
+
 
 def register(request):
     context = {"top": "0", "title": "注册"}
@@ -57,7 +59,7 @@ def register_handle(request):
 # 登陆网页
 def login(request):
     name = request.COOKIES.get("name", "")
-    print(name, "+++++")
+
     return render(request, 'df_user/login.html', {"name": name, "top": "0", "title": "登录"})
 
 
@@ -65,10 +67,12 @@ def login(request):
 def login_handle(request):
     # 获取用户输入信息
     name = request.POST.get('name')
+    print(name, "------")
     pwd = request.POST.get('pwd')
-
+    print(pwd, "=====")
     value = request.POST.get("remember")
-    print(value, "-----")
+
+
     user = UserInfo.objects.filter(uname=name)
 
     s1 = sha1()
@@ -84,7 +88,10 @@ def login_handle(request):
         # 用户名和密码匹配
         if upwd == pwd_sha1:
             request.session["uid"] = user[0].id
-            response = redirect("/user/center/")
+            request.session['is_login'] = 1
+            path = request.session.get("path", "/user/center/")
+            print("--------------------------", path)
+            response = redirect(path)
 
             # 记住用户名
             if value == "1":
@@ -94,12 +101,12 @@ def login_handle(request):
                 final_time = now + save_day
                 # 设置cookie过期时间
                 response.set_cookie("name", name, expires=final_time)
-                print("记住密码")
+
 
             else:
                 # 忘记用户名
                 # 设置cookie过期时间
-                print("忘记密码")
+
                 response.set_cookie("name", "", max_age=-1)
             return response
 
@@ -112,34 +119,33 @@ def login_handle(request):
         context['user_error'] = "用户不存在"
         return render(request, 'df_user/login.html', context)
 
-
+@is_login
 def center(request):
     uid = request.session.get("uid")
     user = UserInfo.objects.filter(id=uid)[0]
     return render(request, 'df_user/center.html', {"user": user, "title": "个人中心"})
 
 
+@is_login
 def site(request):
+    uid = request.session.get("uid")
+    user = UserInfo.objects.filter(id=uid)[0]
 
     context = {}
+
     # 如果请求方法是post，说明是form表单提交
     if request.method == "POST":
+
         post = request.POST
         ushou = post.get("shou")
         uaddr = post.get("uaddr")
         ucode = post.get("ucode")
         uphone = post.get("uphone")
-        print("iusahdhasdha", post)
 
 
-        # 讲用户收货信息写入数据库
-        uid = request.session.get("uid")
-        print("hkshksh", uid)
-        user = UserInfo.objects.filter(id=uid)[0]
-        print("hksdhaskdha", user)
 
+        # 将用户收货信息写入数据库
         recv = ReceInfo()
-
         recv.rshou = ushou
         recv.raddr = uaddr
         recv.rcode = ucode
@@ -148,12 +154,21 @@ def site(request):
         recv.save()
 
 
-        context = {"uaddr": uaddr, "ushou": ushou, "uphone": uphone, "title": "详情"}
+        # context = {"uaddr": uaddr, "ushou": ushou, "uphone": uphone, "title": "详情"}
 
 
+        # 获取该用户的所有收货信息，并写入页面
+
+    reces = user.receinfo_set.all()
+    rece_lsit = []
+    for rece in reces:
+        rece_lsit.append(rece)
+
+    context["recv_list"] = rece_lsit
+    context["user"] = user
     return render(request, 'df_user/site.html', context)
 
-
+@is_login
 def order(request):
     uid = request.session.get("uid")
     user = UserInfo.objects.filter(id=uid)[0]

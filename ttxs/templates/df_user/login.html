@@ -90,7 +90,7 @@
 {% block body %}
 
 	<div class="login_top clearfix">
-		<a href="../index.html" class="login_logo"><img src="/static/images/logo02.png"></a>
+		<a href="../goods/index.html" class="login_logo"><img src="/static/images/logo02.png"></a>
 	</div>
 
 	<div class="login_form_bg">
@@ -104,8 +104,8 @@
 				</div>
 				<div class="form_input">
 					<form method="post" action="/user/login_handle/">
-                        <div>hakjfshdkakdhkl</div>
                         {% csrf_token %}
+{#                        <input type="hidden" name="csrfmiddlewdaretoken" value="wtbzL4k9ITLCJ6IQFEmXCr8kJIFBH9xc">#}
                        <input type="text" name="name" class="name_input" placeholder="请输入用户名" value="{{ name }}"  >
 
                         <div class="user_error">{{ user_error|default:"" }}</div>
