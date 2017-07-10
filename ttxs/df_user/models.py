@@ -10,8 +10,8 @@ class UserInfo(models.Model):
     upwd = models.CharField(max_length=40)
     umail = models.CharField(max_length=30, blank=False)
 
-    def __str__(self):
-        return self.uname.encode("utf-8")
+    def __unicode__(self):
+        return self.uname
 
 
 class ReceInfo(models.Model):
@@ -22,5 +22,5 @@ class ReceInfo(models.Model):
     # 通过ruser属性把recv对象与user对象关联起来，
     ruser = models.ForeignKey("userinfo")
 
-    def __str__(self):
-        return self.rshou.encode("utf-8")
+    def __unicode__(self):
+        return self.rshou

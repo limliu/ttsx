@@ -3,7 +3,7 @@
 
 {% block head %}
 
-    <script type="text/javascript" src="js/jquery-1.12.2.js"></script>
+
 	<script type="text/javascript">
     $(function () {
 
@@ -14,24 +14,53 @@
 		var $to_x = $('#show_count').offset().top;
 		var $to_y = $('#show_count').offset().left;
 
-		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+
 		$('#add_cart').click(function(){
+{#		    获取用户输入数量， 和购物车数量， 让其相加即可#}
+            var left = $(".goods_left").val()
+		    var num = parseInt($(".num_show").val());
+		    var show_count = parseInt($("#show_count").text())
+            var sum = num + show_count
+		    $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'});
 			$(".add_jump").stop().animate({
+
 				'left': $to_y+7,
 				'top': $to_x+7},
 				"fast", function() {
-					$(".add_jump").fadeOut('fast',function(){
-						$('#show_count').html(2);
-					});
 
+					$(".add_jump").fadeOut('fast',function(){
+
+						if (sum > left){
+						   sum = left;
+						   alert("库存不足");
+                        }
+                        $('#show_count').html(sum);
+                        $(".num_show").val(1);
+
+{#                      发起ajax请求，把购物车信息传递给视图函数，需要放在animate的callback函数里面。#}
+                        var goods_id = $("#goods_id").val();
+                        var uname = $("#uname").val();
+                        var num =   parseInt($(".num_show").val());
+                        if(uname){
+                           $.get("/cart/cart_handle/", {"uname": uname, "gid": goods_id, "num": num}, function(data){
+                                    console.log(data.msg);
+                           })
+                        }else{
+{#                            如果未登录，跳转到登录页面#}
+                               window.location="/user/login/"
+                            };
+
+                    });
 			});
+
+
+
 		});
 
 {#		商品数量，和总价函数#}
-
         $(".num_show").blur(function(){
             var num = parseInt($(".num_show").val());
-            var left = {{ goods.gleft }};
+            var left = $(".goods_left").val()
             if(num>left){
                 num = left;
             }
@@ -49,6 +78,7 @@
         })
 
         $(".add").click(function(){
+
             var num = parseInt($(".num_show").val());
             num++;
             $(".num_show").val(num).blur();
@@ -59,26 +89,25 @@
             num--;
             $(".num_show").val(num).blur();
         })
-
-
-
     })
-
 	</script>
 
 
 {% endblock head %}
 
-
-	 {% block right %}
-
+{% block detail %}
 	<div class="breadcrumb">
-		<a href="#">全部分类</a>
+		<a href="/">全部分类</a>
 		<span>></span>
-		<a href="#">新鲜水果</a>
+		<a href="/typelist{{ gtype.id }}_1_0/">{{ gtype.ttitle }}</a>
 		<span>></span>
 		<a href="#">商品详情</a>
 	</div>
+    <input type="text" id="goods_id" value="{{ goods.id }}" style="display: none">
+    <input type="text" id="uname" value="{{ request.session.uname }}" style="display: none">
+
+
+
 
 	<div class="goods_detail_con clearfix">
 		<div class="goods_detail_pic fl"><img src="/static/{{ goods.gpic }}"></div>
@@ -95,7 +124,8 @@
 				<div class="num_add fl">
 					<input type="text" class="num_show fl" value="1">
 					<a href="javascript:;" class="add fr">+</a>
-					<a href="javascript:;" class="minus fr">-</a>	
+					<a href="javascript:;" class="minus fr">-</a>
+                    <input type="text" class="goods_left" value="{{ goods.gleft }}" style="display: none">
 				</div> 
 			</div>
 			<div class="total">总价：<em>{{ goods.gprice }}元</em></div>
@@ -106,24 +136,15 @@
 		</div>
 	</div>
 
-	<div class="main_wrap clearfix">
-		<div class="l_wrap fl clearfix">
-			<div class="new_goods">
-				<h3>新品推荐</h3>
-				<ul>
-                    {% for new in new_list %}
-					<li>
-						<a href="{{ new.id }}"><img src="/static/{{ new.gpic }}"></a>
-						<h4><a href="#">{{ new.gtitle }}</a></h4>
-						<div class="prize">￥{{ new.gprice }}</div>
-					</li>
-                    {% endfor %}
 
-				</ul>
-			</div>
-		</div>
 
-		<div class="r_wrap fr clearfix">
+
+	{% endblock detail %}
+
+
+
+	{% block right %}
+        <div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
 				<li class="active">商品介绍</li>
 				<li>评论</li>
@@ -137,9 +158,8 @@
 			</div>
 
 		</div>
-	</div>
-
+    <div class="add_jump"></div>
 	{% endblock right %}
-	<div class="add_jump"></div>
+
 
 

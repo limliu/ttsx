@@ -9,6 +9,7 @@ from django.http import JsonResponse, HttpResponse
 
 from models import UserInfo, ReceInfo
 
+from goods.models import GoodsInfo
 from hashlib import sha1
 
 import datetime
@@ -88,9 +89,9 @@ def login_handle(request):
         # 用户名和密码匹配
         if upwd == pwd_sha1:
             request.session["uid"] = user[0].id
+            request.session["uname"] = user[0].uname
             request.session['is_login'] = 1
             path = request.session.get("path", "/user/center/")
-            print("--------------------------", path)
             response = redirect(path)
 
             # 记住用户名
@@ -123,7 +124,18 @@ def login_handle(request):
 def center(request):
     uid = request.session.get("uid")
     user = UserInfo.objects.filter(id=uid)[0]
-    return render(request, 'df_user/center.html', {"user": user, "title": "个人中心"})
+
+    # 获取存在cookie里的最近浏览商品信息,若没有则赋值为"",把最后一个去掉
+    gid_list = request.COOKIES.get("gids", "").split(",")
+    if gid_list[-1] == "":
+        gid_list.pop()
+
+    # 根据gid查询商品， 并把商品对象加入商品列表。
+    goods_list = []
+    for gid in gid_list:
+        goods_list.append(GoodsInfo.objects.get(id=gid))
+    return render(request, 'df_user/center.html',\
+           {"user": user, "title": "个人中心", "goods_list": goods_list, "show_cart": "1"})
 
 
 @is_login
@@ -176,3 +188,9 @@ def order(request):
     return render(request, 'df_user/order.html', {"user": user, "title": "订单"})
 
 
+def logoff(request):
+    # 退出把session都清空
+    request.session["uid"] = ""
+    request.session["uname"] = ""
+    request.session['is_login'] = ""
+    return redirect("/user/login/")

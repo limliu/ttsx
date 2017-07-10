@@ -28,4 +28,6 @@ class GoodsInfo(models.Model):
     class Meta:
         db_table = "df_goods_goodsinfo"
 
+    def __unicode__(self):
+        return self.gtitle
 

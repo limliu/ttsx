@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
-{% block head %} {% endblock head %}
+
 
 
 {% block body %}
-
     <div class="navbar_con">
 		<div class="navbar clearfix">
 			<div class="subnav_con fl">
@@ -12,9 +11,7 @@
 				<span></span>
 				<ul class="subnav">
                     {% for type in type_list %}
-
 					    <li><a href="/typelist{{ type.id }}_1_0/" class="fruit">{{ type.ttitle }}</a></li>
-
                     {% endfor %}
 				</ul>
 			</div>
@@ -28,7 +25,26 @@
 		</div>
 	</div>
 
+    {% block detail %}  {% endblock detail %}
+    <div class="main_wrap clearfix">
+
+    {% block left %}
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+                    {% for new in new_list %}
+					<li>
+						<a href="/{{ new.id }}/"><img src="/static/{{ new.gpic }}"></a>
+						<h4><a href="#">{{ new.gtitle }}</a></h4>
+						<div class="prize">￥{{ new.gprice }}</div>
+					</li>
+                    {% endfor %}
+
+				</ul>
+			</div>
+		</div>
+        {% endblock left %}
     {% block right %} {% endblock right %}
-
-
+    </div>
 {% endblock body %}

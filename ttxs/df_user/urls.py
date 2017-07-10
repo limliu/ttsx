@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^center/$', views.center),
     url(r'^site/$', views.site),
     url(r'^order/$', views.order),
+    url(r'^logoff/$', views.logoff),
 
 ]
